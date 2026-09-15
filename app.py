@@ -31,6 +31,9 @@ if "pasted_images" not in st.session_state:
 if "eob_text" not in st.session_state:
     st.session_state.eob_text = ""
 
+if "last_paste_id" not in st.session_state:
+    st.session_state.last_paste_id = None
+
 
 def image_to_base64(image):
     buffer = io.BytesIO()
@@ -74,8 +77,11 @@ with tab1:
 
     if paste_result.image_data is not None:
         img_b64 = image_to_base64(paste_result.image_data)
-        if img_b64 not in st.session_state.pasted_images:
+        img_hash = hash(img_b64)
+        if img_hash != st.session_state.last_paste_id:
             st.session_state.pasted_images.append(img_b64)
+            st.session_state.last_paste_id = img_hash
+            st.rerun()
 
     if st.session_state.pasted_images:
         st.write(f"**Pasted images ({len(st.session_state.pasted_images)}):**")
